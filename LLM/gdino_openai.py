@@ -2,12 +2,12 @@ from openai import OpenAI
 
 client = OpenAI()
 
-with open("gdino_prompt.md", "r") as file:
+with open("LLM/gdino_prompt.md", "r") as file:
     prompt = file.read()
 
 user_input = input("Input: ")
 
-print("Generating response...")
+print("Generating Grounded-SAM-2 text prompt...")
 
 completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -17,4 +17,6 @@ completion = client.chat.completions.create(
     ],
 )
 
-print(completion.choices[0].message.content)
+print("Grounded-SAM-2 text prompt: " + completion.choices[0].message.content)
+with open("temp/gdino_text_prompt.txt", "w") as file:
+    file.write(completion.choices[0].message.content)

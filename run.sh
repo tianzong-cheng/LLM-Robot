@@ -5,9 +5,17 @@ cd $LLM_BASE_PATH
 rm -rf temp
 mkdir temp
 mkdir temp/objects
+mkdir temp/order
+rm -rf ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4/simulate_datasets
+cd ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4
+mkdir simulate_datasets
+cd $LLM_BASE_PATH
 
 rm -rf debug
 mkdir debug
+
+# Go to home position
+./flexiv/build/home 192.168.2.100 192.168.2.109
 
 # Prompt the user for input
 read -p "Input: " user_input
@@ -27,4 +35,10 @@ python3 LLM/main_openai.py
 echo -e "\e[33m[INFO] Running planning module ...\e[0m"
 cp temp/planning_full.py ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4
 cd ~/.local/share/ov/pkg/isaac-sim-2*
-./python.sh standalone_examples/api/omni.isaac.manipulators/RIZON4/planning_full.py >debug/planning_output.txt
+./python.sh standalone_examples/api/omni.isaac.manipulators/RIZON4/planning_full.py
+
+cd $LLM_BASE_PATH
+cp ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4/simulate_datasets/* ./temp
+python3 flexiv/data_converter.py
+
+./flexiv/build/run 192.168.2.100 192.168.2.109

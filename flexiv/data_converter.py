@@ -27,6 +27,7 @@ if __name__ == "__main__":
         file.write("waypoints=")
 
     file_path = "temp/order0.txt"
+    last_flag = False
 
     with open(file_path, "r") as file:
         for line in file:
@@ -56,10 +57,11 @@ if __name__ == "__main__":
                 output = " ".join(f"{deg:.2f}" for deg in joint_positions_degrees)
                 with open(f"temp/order/joint_positions_{file_count}.txt", "a") as file:
                     file.write(output + " WORLD WORLD_ORIGIN ")
-            if line_count > 70:
+            if (last_flag and not flag_not_none) or line_count > 70:
                 WrapFile()
                 file_count += 1
                 line_count = 0
                 with open(f"temp/order/joint_positions_{file_count}.txt", "w") as file:
                     file.write("waypoints=")
+            last_flag = flag_not_none
     WrapFile()

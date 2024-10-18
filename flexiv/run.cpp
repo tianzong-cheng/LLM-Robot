@@ -8,6 +8,7 @@
  */
 
 #include <flexiv/Exception.hpp>
+#include <flexiv/Gripper.hpp>
 #include <flexiv/Log.hpp>
 #include <flexiv/Robot.hpp>
 #include <flexiv/Utility.hpp>
@@ -59,12 +60,13 @@ int main(int argc, char* argv[]) {
   // Print description
   log.info("Tutorial description:");
   printDescription();
-
+  bool is_gripper_closed = false;
   try {
     // RDK Initialization
     // =========================================================================================
     // Instantiate robot interface
     flexiv::Robot robot(robotIP, localIP);
+    flexiv::Gripper gripper(robot);
 
     // Clear fault on robot server if any
     if (robot.isFault()) {
@@ -94,6 +96,7 @@ int main(int argc, char* argv[]) {
     // =========================================================================================
     // Switch to primitive execution mode
     robot.setMode(flexiv::Mode::NRT_PRIMITIVE_EXECUTION);
+    gripper.move(0.09, 0.1, 20);  // open the gripper
 
     // (3) Move robot TCP to a target position in world (base) frame
     // -----------------------------------------------------------------------------------------
@@ -108,7 +111,7 @@ int main(int argc, char* argv[]) {
     //       Unit: m/s
     // NOTE: The rotations use Euler ZYX convention, rot_x means Euler ZYX angle
     // around X axis
-    for (int i = 1; i <= 30; i++) {
+    for (int i = 1; i <= 3; i++) {
       log.info("Executing primitive " + std::to_string(i));
 
       std::string file_path =
@@ -132,6 +135,13 @@ int main(int argc, char* argv[]) {
                                             "reachedTarget") != "1") {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
+      if (is_gripper_closed) {
+        gripper.move(0.09, 0.1, 20);  // open
+      } else {
+        gripper.move(0.02, 0.1, 20);  // close
+      }
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      is_gripper_closed = !is_gripper_closed;
     }
 
     // All done, stop robot and put into IDLE mode

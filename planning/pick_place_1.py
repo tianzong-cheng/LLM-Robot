@@ -1,6 +1,6 @@
 from omni.isaac.kit import SimulationApp
 
-simulation_app = SimulationApp({"headless": False})
+simulation_app = SimulationApp({"headless": True})
 
 import argparse
 

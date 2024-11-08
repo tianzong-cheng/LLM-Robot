@@ -1,5 +1,6 @@
 import json
 import math
+import os
 
 output = ""
 file_count = 1
@@ -26,7 +27,9 @@ if __name__ == "__main__":
     with open("temp/order/joint_positions_1.txt", "w") as file:
         file.write("waypoints=")
 
-    file_path = "temp/order0.txt"
+    order_number = os.getenv("LLM_ORDER_NUMBER")
+    file_path = "temp/order" + order_number + ".txt"
+
     last_flag = False
 
     with open(file_path, "r") as file:

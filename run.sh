@@ -39,6 +39,17 @@ cd ~/.local/share/ov/pkg/isaac-sim-2*
 
 cd $LLM_BASE_PATH
 cp ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4/simulate_datasets/* ./temp
-python3 flexiv/data_converter.py
 
-./flexiv/build/run 192.168.2.100 192.168.2.109
+for file in ./temp/order*.txt; do
+    # Check if the file exists
+    if [[ -f "$file" ]]; then
+        rm ./temp/order/*
+
+        LLM_ORDER_NUMBER=$(basename "$file" | sed 's/order\([0-9]*\)\.txt/\1/')
+        export LLM_ORDER_NUMBER
+
+        python3 flexiv/data_converter.py
+
+        ./flexiv/build/run 192.168.2.100 192.168.2.109
+    fi
+done

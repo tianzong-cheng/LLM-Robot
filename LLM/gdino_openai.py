@@ -30,3 +30,9 @@ for object in list:
         file_name = f"object_{i}.txt"
         with open("temp/objects/" + file_name, "w") as file:
             file.write(object.strip() + ".")
+
+        file_name_fp = f"fp_{i}.txt"
+        with open("temp/objects/" + file_name_fp, "w") as file:
+            object_underscore = object.strip()
+            object_underscore = object_underscore.replace(" ", "_")
+            file.write(object_underscore)

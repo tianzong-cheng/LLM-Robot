@@ -1,3 +1,15 @@
+cube_size = np.array([0.04, 0.04, 0.05])
+cube_sizes = [cube_size for _ in range(subtask_num)]
+my_task = PickPlace(
+    name="denso_pick_place",
+    kind="cube",
+    obj_num=subtask_num,
+    cube_initial_position=initial_position,
+    target_position=target_position,
+    cube_initial_orientation=None,
+    cube_size=cube_sizes,
+)
+
 my_world.add_task(my_task)
 my_world.reset()
 

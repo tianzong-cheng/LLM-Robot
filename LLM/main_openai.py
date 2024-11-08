@@ -8,7 +8,7 @@ with open("LLM/main_prompt.md", "r") as file:
 
 with open("temp/user_input.txt", "r") as file:
     user_input = file.read()
-    prompt += "\nTask: " + user_input + "\nObject poses:\n"
+    prompt += "\nTask: " + user_input + "\nObject positions:\n"
 
 i = 1
 while True:
@@ -37,7 +37,7 @@ with open("temp/complete_main_prompt.md", "w") as file:
     file.write(prompt)
 
 completion = client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-4o",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": prompt},

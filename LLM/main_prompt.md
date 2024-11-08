@@ -1,172 +1,74 @@
 # Background
 
-You will be writing a robotic arm path planning code running in Issac Sim. The code is divided into three parts. The first and the third part are given by me. Your job is to finish the second part of the code so that the three code snippets combine into a complete Python script.
+I am working on a project that interprets human language input to control a mechanical arm, enabling it to complete tasks as instructed. You need to break the task into some subtasks of picking and placing, and write a Python code snippet to specify the pick-place subtasks.
 
-I will give you poses of some objects, which is now only their Cartesian coordinate. Then I will show you your task. Your code should follow the instruction and do the job, which is typically moving a few objects from their current positions to target positions. Do be aware that if you are piling up some objects, you need to first move the object which will eventually be at the bottom of the pile, then the second object counting from bottom-up, etc. Also note that you may need to add a small offset in the z-axis of the target position for objects which are put on other objects. For your information, the first part and third part of the code will be given. At last, for your reference, I will give you some input-output pairs which include object poses, user task and your desired output.
+You will be given a template of the code snippet. Please preserve the formatting and overall template that I provide. Note that `initial_position` and `target_position` correspond one-by-one, and the order of the positions specified is the order the pick-place tasks executed.
 
-You should only output the second part of the code, which means you don't need to include any code which is already given in the first and the third part. They are just for your information. For my convenience, please only output the code in pure text format, which means you don't need to output any explanation of the code. Don't include any unknown information in your code. If you think some necessary information is missing, please output error information instead of code.
+Don't include any unknown information in your code. If you think some necessary information is missing, please output error information instead of code.
 
-Note that all objects are treated as cubes in simulation for simplicity. For now, assume all cubes have the size of `[0.033, 0.033, 0.038]`.
+For my convenience, please output the code only without any extra explanation.
 
-# Information
-
-## Given Code Snippets
-
-The first part of the code:
+# Code Snippet Template
 
 ```python
-from omni.isaac.kit import SimulationApp
-
-simulation_app = SimulationApp({"headless": False})
-
-import argparse
-
-import numpy as np
-from controllers.pick_place import PickPlaceController
-from omni.isaac.core import World
-from tasks.pick_place import PickPlace
-import time, os
-
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--test", default=False, action="store_true", help="Run in test mode"
-)
-args, unknown = parser.parse_known_args()
-
-my_world = World(stage_units_in_meters=1.0)
-```
-
-The third part of the code:
-
-```python
-my_world.add_task(my_task)
-my_world.reset()
-
-my_denso = my_world.scene.get_object("rizon4_robot")
-my_controller = PickPlaceController(
-    name="controller", robot_articulation=my_denso, gripper=my_denso.gripper
-)
-task_params = my_world.get_task("denso_pick_place").get_params()
-articulation_controller = my_denso.get_articulation_controller()
-
-i = 0
-action = -1
-start_time = time.time()
-
-while simulation_app.is_running():
-    my_world.step(render=True)
-    if my_world.is_playing():
-        if my_world.current_time_step_index == 0:
-            my_world.reset()
-            my_controller.reset()
-        observations = my_world.get_observations()
-
-        actions = my_controller.forward(
-            picking_position=observations[task_params["cube_name"]["value"]][
-                "position"
-            ],
-            placing_position=observations[task_params["cube_name"]["value"]][
-                "target_position"
-            ],
-            current_joint_positions=observations[task_params["robot_name"]["value"]][
-                "joint_positions"
-            ],
-            end_effector_offset=np.array([0.0, 0, 0.18]),
-        )
-
-        if action < my_controller._event:
-            end_time = time.time()
-            print(
-                "action ", str(action), " time:", (end_time - start_time) * 1000, " ms"
-            )
-            action = my_controller._event
-            start_time = time.time()
-        num = my_task.task_num
-        text = (
-            "./standalone_examples/api/omni.isaac.manipulators/RIZON4/simulate_datasets/order"
-            + str(num)
-            + ".txt"
-        )
-
-        os.makedirs(os.path.dirname(text), exist_ok=True)
-        with open(text, "a", encoding="utf-8") as file:
-            local_action = str(actions)
-            local_action = local_action.replace("'", '"')
-            file.write(local_action + "\n")
-
-        if my_controller.is_done():
-            print("done picking and placing")
-            my_controller.reset()
-            my_task.task_num += 1
-            if my_task.task_num >= my_task._obj_num:
-                exit()
-            print(my_task.task_num)
-            task_params = my_world.get_task("denso_pick_place").get_params()
-            action = -1
-
-        articulation_controller.apply_action(actions)
-
-    if args.test is True:
-        break
-
-simulation_app.close()
-```
-
-## Input-output Example Pairs
-
-### Example 1
-
-Task: Put the apple in the basket.
-
-Object poses:
-
-- apple: `[0.5, 0, 0.2]`
-- basket: `[0.4, -0.25, 0.02]`
-
-Desired output:
-
-```python
+subtask_num = N  # Replace N with the number of tasks
+initial_position = [
+    # N lines of np.array([x, y, z])
+    np.array([x_i, y_i, z_i]),
+]
 target_position = [
-    np.array([0.4, -0.25, 0.02]),
+    # N lines of np.array([x, y, z])
+    np.array([x_t, y_t, z_t]),
 ]
-cube_position = [
-    np.array([0.5, 0, 0.2]),
-]
-cube_size = [
-    np.array([0.033, 0.033, 0.038]),
-]
-my_task = PickPlace(
-    name="denso_pick_place",
-    kind="cube",
-    obj_num=1,
-    cube_initial_position=cube_position,
-    target_position=target_position,
-    cube_initial_orientation=None,
-    cube_size=cube_size,
-)
 ```
 
-### Example 2
+# Input-output Example Pairs
 
-Task: Put the apple in the basket.
+## Example 1
 
-Object poses:
+Task: Put the red cup in the cup holder.
 
-- apple: `[0.5, 0, 0.2]`
+Object positions:
 
-Desired output:
+- red cup: `[0.5, -0.2, 0]`
+- cup holder: `[0.3, -0.4, 0.1]`
 
-Error: The pose of the basket is missing.
+```python
+subtask_num = 1
+initial_position = [
+    np.array([0.5, -0.2, 0]),
+]
+target_position = [
+    np.array([0.3, -0.4, 0.1]),
+]
+```
+
+## Example 2
+
+Task: Stack the objects on the table in the order of red cube, black cube and yellow cylinder, from top to bottom.
+
+Object positions:
+
+- red cube: `[0.5, -0.2, 0]`
+- black cube: `[0.3, -0.4, 0.1]`
+- yellow cylinder: `[0.4, -0.3, 0]`
+
+```python
+subtask_num = 2
+initial_position = [
+    np.array([0.3, -0.4, 0.1]),
+    np.array([0.5, -0.2, 0]),
+]
+target_position = [
+    np.array([0.4, -0.3, 0 + 0.05]),
+    np.array([0.4, -0.3, 0 + 0.05 * 2]),
+]
+```
+
+### Explanation
+
+When stacking several objects, you need to stack from bottom up. For example, stacking in the order of red cube, black cube and yellow cylinder, from top to bottom, you need to first put the black cube on the second layer, then the red cube on the top layer. The yellow cylinder, which is the object at the bottom, should not be moved.
+
+Note that a small offset in the z-axis needs to be added. Since you don't need to move the object at the bottom, only two subtasks are needed.
 
 # Your Task
-
-Task: Put all the drink bottles in the trash bin and put all the fruits in the basket.
-
-Object poses:
-
-- coca-cola: `[0.1, 0.1, 0.1]`
-- sprite: `[0.2, 0.3, 0.1]`
-- apple: `[-0.1, -0.1, 0.1]`
-- pear: `[-0.1, 0, 0.1]`
-- trash bin: `[0.3, 0.3, 0.05]`
-- basket: `[-0.3, -0.3, 0.05]`

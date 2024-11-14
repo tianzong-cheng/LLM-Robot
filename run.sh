@@ -32,10 +32,22 @@ python3 ./coord_converter.py
 echo -e "\e[33m[INFO] Running LLM module ...\e[0m"
 python3 LLM/main_openai.py
 
-echo -e "\e[33m[INFO] Running planning module ...\e[0m"
+rotate() {
+    local pid=$1
+    local spin='|/-\'
+    local i=0
+    while ps -p $pid >/dev/null; do
+        printf "\r\e[33m[INFO] Running planning module ... ${spin:i%4:1}"
+        ((i++))
+        sleep 0.1
+    done
+    printf "\r\e[33m[INFO] Running planning module ... Done!\n\e[0m"
+}
 cp temp/planning_full.py ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4
 cd ~/.local/share/ov/pkg/isaac-sim-2*
-./python.sh standalone_examples/api/omni.isaac.manipulators/RIZON4/planning_full.py
+./python.sh standalone_examples/api/omni.isaac.manipulators/RIZON4/planning_full.py >$LLM_BASE_PATH/debug/planning_output.txt &
+pid=$!
+rotate $pid
 
 cd $LLM_BASE_PATH
 cp ~/.local/share/ov/pkg/isaac-sim-2*/standalone_examples/api/omni.isaac.manipulators/RIZON4/simulate_datasets/* ./temp

@@ -45,6 +45,25 @@ target_position = [
 
 ## Example 2
 
+Task: Put the red cup on the black cube.
+
+Object positions:
+
+- red cup: `[0.5, -0.2, 0]`
+- black cube: `[0.3, -0.4, 0.1]`
+
+```python
+subtask_num = 1
+initial_position = [
+    np.array([0.5, -0.2, 0]),
+]
+target_position = [
+    np.array([0.3, -0.4, 0.1 + 0.05]),
+]
+```
+
+## Example 3
+
 Task: Stack the objects on the table in the order of red cube, black cube and yellow cylinder, from top to bottom.
 
 Object positions:
